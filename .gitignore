@@ -1,0 +1,11 @@
+.build/
+.swiftpm/
+DerivedData/
+.DS_Store
+.env
+.env.*
+*.plan.json
+*.request.json
+*.response.json
+*.token
+*.secret

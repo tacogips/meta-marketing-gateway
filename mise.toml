@@ -1,0 +1,70 @@
+[tasks.format-check]
+run = "swift format lint --recursive --strict Sources Tests Plugins Package.swift"
+
+[tasks.lint]
+run = "swift format lint --recursive --strict Sources Tests Plugins Package.swift"
+
+[tasks.test]
+run = "sh scripts/run-swiftpm-external.sh test --parallel"
+
+[tasks.build]
+run = "sh scripts/run-swiftpm-external.sh build"
+
+[tasks.release-build]
+run = "sh scripts/run-swiftpm-external.sh build -c release"
+
+[tasks.check]
+run = """
+swift format lint --recursive --strict Sources Tests Plugins Package.swift
+sh scripts/run-swiftpm-external.sh test --parallel
+sh scripts/run-swiftpm-external.sh build
+sh scripts/run-swiftpm-external.sh build -c release
+sh scripts/run-swiftpm-external.sh run meta-marketing-gateway-reader --help
+sh scripts/run-swiftpm-external.sh run meta-marketing-gateway-writer --help
+sh scripts/run-swiftpm-external.sh run meta-marketing-gateway-deleter --help
+sh scripts/run-swiftpm-external.sh run meta-marketing-gateway-reader catalog list
+sh scripts/run-swiftpm-external.sh run meta-marketing-gateway-writer catalog list
+sh scripts/run-swiftpm-external.sh run meta-marketing-gateway-deleter catalog list
+sh scripts/verify-focused-safety-tests.sh
+sh scripts/verify-target-separation.sh
+sh scripts/verify-catalog-projections.sh
+sh scripts/verify-dependencies.sh
+sh scripts/verify-supply-chain.sh
+sh scripts/verify-no-secret-artifacts.sh
+gitleaks detect --source . --no-git
+semgrep scan --config auto .
+sh scripts/verify-reproducible-archives.sh
+"""
+
+[tasks.target-audit]
+run = "sh scripts/verify-target-separation.sh"
+
+[tasks.catalog-audit]
+run = "sh scripts/verify-catalog-projections.sh"
+
+[tasks.package-local]
+run = "sh scripts/build-local-archives.sh"
+
+[tasks.package]
+run = "sh scripts/build-local-archives.sh"
+
+[tasks.package-verify]
+run = "sh scripts/verify-reproducible-archives.sh"
+
+[tasks.verify-release]
+depends = ["check"]
+
+[tasks.secret-audit]
+run = "sh scripts/verify-no-secret-artifacts.sh"
+
+[tasks.gitleaks-audit]
+run = "gitleaks detect --source . --no-git"
+
+[tasks.sast-audit]
+run = "semgrep scan --config auto ."
+
+[tasks.supply-chain-audit]
+run = "sh scripts/verify-supply-chain.sh"
+
+[tasks.dependency-audit]
+run = "sh scripts/verify-dependencies.sh"
